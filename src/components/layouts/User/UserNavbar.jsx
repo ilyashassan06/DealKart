@@ -82,6 +82,18 @@ function UserNavbar() {
 </div>
 
       <div className=" flex text-xl items-center gap-6">
+         <button
+         onClick={()=>navigate("/merchant/login")}
+      className={`text-sm font-semibold px-4 py-2 rounded-xl transition
+      ${
+        Theme === "dark"
+          ? "bg-white text-black hover:bg-gray-200"
+          : "bg-black text-white hover:bg-gray-800"
+      }`}
+    >
+      Join as Merchant
+    </button>
+
         <button
           onClick={() => navigate("/cart")}
           className="text-xl  hover:opacity-70"
@@ -199,6 +211,18 @@ function UserNavbar() {
       }
     >
       Contact Us
+    </NavLink>
+    <NavLink
+      to="/merchant/dashboard"
+      onClick={() => setMenuOpen(false)}
+      className={({ isActive }) =>
+        `w-full text-center py-3 border-b ${
+          Theme === "dark" ? "border-gray-700" : "border-gray-200"
+        }
+        ${isActive ? "text-red-600 font-semibold" : "hover:opacity-70"}`
+      }
+    >
+      Merchant Dashboard
     </NavLink>
 
     <button

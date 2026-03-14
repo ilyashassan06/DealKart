@@ -1,11 +1,40 @@
-import React from "react";
-
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "../../context/ThemeContext";
+import { db, auth } from "../../firebase/firebase";
+import { doc, getDoc } from "firebase/firestore";
 
 function Dashboard() {
   const { Theme } = useTheme();
   const navigate = useNavigate();
+
+  const [products, setProducts] = useState([]);
+
+  /* ---------------- FETCH MERCHANT DATA ---------------- */
+
+  useEffect(() => {
+    const fetchMerchantData = async () => {
+      try {
+        const merchantId = auth.currentUser.uid;
+
+        const merchantRef = doc(db, "merchant", merchantId);
+        const merchantSnap = await getDoc(merchantRef);
+
+        if (merchantSnap.exists()) {
+          const data = merchantSnap.data();
+          setProducts(data.products || []);
+        }
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    fetchMerchantData();
+  }, []);
+
+  const totalProducts = products.length;
+
+  /* ---------------- UI ---------------- */
 
   return (
     <div
@@ -13,12 +42,13 @@ function Dashboard() {
         Theme === "dark" ? "bg-gray-950 text-white" : "bg-gray-50 text-black"
       }`}
     >
-      {/* Page Title */}
+      {/* Title */}
       <h1 className="text-3xl font-bold mb-8">Merchant Dashboard</h1>
 
-      {/* Stats Section */}
+      {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
 
+        {/* Total Products */}
         <div
           className={`p-6 rounded-xl border shadow-sm ${
             Theme === "dark"
@@ -27,9 +57,10 @@ function Dashboard() {
           }`}
         >
           <p className="text-sm opacity-70">Total Products</p>
-          <h2 className="text-2xl font-bold mt-2">0</h2>
+          <h2 className="text-2xl font-bold mt-2">{totalProducts}</h2>
         </div>
 
+        {/* Orders (future) */}
         <div
           className={`p-6 rounded-xl border shadow-sm ${
             Theme === "dark"
@@ -41,6 +72,7 @@ function Dashboard() {
           <h2 className="text-2xl font-bold mt-2">0</h2>
         </div>
 
+        {/* Revenue (future) */}
         <div
           className={`p-6 rounded-xl border shadow-sm ${
             Theme === "dark"
@@ -54,10 +86,9 @@ function Dashboard() {
 
       </div>
 
-      {/* Add Product Section */}
+      {/* Add Product */}
       <div
-        className={`p-6 mb-10 rounded-xl border flex flex-col md:flex-row md:items-center md:justify-between gap-4
-        ${
+        className={`p-6 mb-10 rounded-xl border flex flex-col md:flex-row md:items-center md:justify-between gap-4 ${
           Theme === "dark"
             ? "bg-gray-900 border-gray-700"
             : "bg-white border-gray-200"
@@ -104,7 +135,9 @@ function Dashboard() {
             <thead>
               <tr
                 className={`border-b ${
-                  Theme === "dark" ? "border-gray-700" : "border-gray-200"
+                  Theme === "dark"
+                    ? "border-gray-700"
+                    : "border-gray-200"
                 }`}
               >
                 <th className="py-3">Product</th>
@@ -114,17 +147,42 @@ function Dashboard() {
             </thead>
 
             <tbody>
-              {/* Placeholder rows (later replace with Firestore data) */}
 
-              <tr
-                className={`border-b ${
-                  Theme === "dark" ? "border-gray-800" : "border-gray-100"
-                }`}
-              >
-                <td className="py-3">No products yet</td>
-                <td className="py-3">-</td>
-                <td className="py-3">-</td>
-              </tr>
+              {products.length === 0 ? (
+                <tr>
+                  <td className="py-3">No products yet</td>
+                  <td>-</td>
+                  <td>-</td>
+                </tr>
+              ) : (
+                products.slice(-5).reverse().map((product, index) => (
+                  <tr
+                    key={index}
+                    className={`border-b ${
+                      Theme === "dark"
+                        ? "border-gray-800"
+                        : "border-gray-100"
+                    }`}
+                  >
+                    <td className="py-3 flex items-center gap-3">
+
+                      {product.images?.[0] && (
+                        <img
+                          src={product.images[0]}
+                          className="w-10 h-10 object-cover rounded"
+                        />
+                      )}
+
+                      {product.name}
+
+                    </td>
+
+                    <td>₹{product.price}</td>
+
+                    <td>{product.stock}</td>
+                  </tr>
+                ))
+              )}
 
             </tbody>
 
