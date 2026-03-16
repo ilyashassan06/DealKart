@@ -4,8 +4,10 @@ import { useTheme } from "../../context/ThemeContext";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { auth, db } from "../../firebase/firebase";
+import { useNavigate } from "react-router-dom";
 
 function MerchantSignup() {
+  const navigate = useNavigate();
 
   const { theme } = useTheme();
 
@@ -34,7 +36,9 @@ function MerchantSignup() {
       role:"merchant"
     })
 
-    console.log(merchant)
+    navigate("/merchant/login")
+
+    
    } catch (error) {
     
    }

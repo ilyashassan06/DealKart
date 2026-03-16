@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useTheme } from "../../context/ThemeContext";
 import { db, auth } from "../../firebase/firebase";
-import { doc, setDoc, arrayUnion } from "firebase/firestore";
+import { addDoc, collection, doc, getDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 
 function AddProduct() {
@@ -75,65 +75,88 @@ function AddProduct() {
     return data.secure_url;
   };
 
-  const handleSubmit = async () => {
-    try {
-      if (!productData.name || !productData.price) {
-        alert("Product name and price required");
-        return;
-      }
-
-      setLoading(true);
-
-      const merchantId = auth.currentUser.uid;
-
-      const imageUrls = [];
-
-      for (let image of productData.images) {
-        const url = await uploadToCloudinary(image);
-        imageUrls.push(url);
-      }
-
-      const finalProduct = {
-        ...productData,
-        images: imageUrls,
-        createdAt: new Date()
-      };
-
-      const merchantRef = doc(db, "merchant", merchantId);
-
-      await setDoc(
-        merchantRef,
-        {
-          products: arrayUnion(finalProduct)
-        },
-        { merge: true }
-      );
-
-      alert("Product Added Successfully");
-      navigate("/merchant/dashboard")
-
-      setProductData({
-        name: "",
-        shortDescription: "",
-        fullDescription: "",
-        brand: "",
-        price: "",
-        discountPrice: "",
-        stock: "",
-        sku: "",
-        category: "",
-        subcategory: "",
-        tags: "",
-        images: []
-      });
-
-      setLoading(false);
-
-    } catch (err) {
-      console.log(err);
-      setLoading(false);
+ const handleSubmit = async () => {
+  try {
+    if (!productData.name || !productData.price) {
+      alert("Product name and price required");
+      return;
     }
-  };
+
+    setLoading(true);
+
+    const merchantId = auth.currentUser.uid;
+
+    // Get merchant details
+    const merchantRef = doc(db, "merchant", merchantId);
+    const merchantSnap = await getDoc(merchantRef);
+
+    let merchantName = "";
+    let storeName = "";
+
+    if (merchantSnap.exists()) {
+      const merchantData = merchantSnap.data();
+      merchantName = merchantData.name || "";
+      storeName = merchantData.storeName || "";
+    }
+
+    // Upload images
+    const imageUrls = [];
+
+    for (let image of productData.images) {
+      const url = await uploadToCloudinary(image);
+      imageUrls.push(url);
+    }
+
+    const finalProduct = {
+      name: productData.name,
+      shortDescription: productData.shortDescription,
+      fullDescription: productData.fullDescription,
+      brand: productData.brand,
+      price: Number(productData.price),
+      discountPrice: Number(productData.discountPrice),
+      stock: Number(productData.stock),
+      sku: productData.sku,
+      category: productData.category,
+      subcategory: productData.subcategory,
+      tags: productData.tags,
+      images: imageUrls,
+
+      // Merchant info
+      merchantId: merchantId,
+      merchantName: merchantName,
+      storeName: storeName,
+
+      createdAt: Date.now()
+    };
+
+    await addDoc(collection(db, "products"), finalProduct);
+
+    alert("Product Added Successfully");
+
+    navigate("/merchant/dashboard");
+
+    setProductData({
+      name: "",
+      shortDescription: "",
+      fullDescription: "",
+      brand: "",
+      price: "",
+      discountPrice: "",
+      stock: "",
+      sku: "",
+      category: "",
+      subcategory: "",
+      tags: "",
+      images: []
+    });
+
+    setLoading(false);
+
+  } catch (err) {
+    console.log(err);
+    setLoading(false);
+  }
+};
 
   const card =
     Theme === "dark"

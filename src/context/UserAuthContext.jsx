@@ -37,7 +37,7 @@ export const UserAuthProvider = ({children })=>{
 
     return(
         <UserAuthContext.Provider value={{user,Loading}}>
-            {!Loading && children }
+            {children }
         </UserAuthContext.Provider>
     )
     

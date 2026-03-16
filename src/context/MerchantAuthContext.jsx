@@ -32,7 +32,7 @@ return ()=>unSubscribe();
 
 return(
     <MerchantAuthContext.Provider value={{merchant,Loading}} >
-        {!Loading && children}
+        {children}
     </MerchantAuthContext.Provider>
 )
    

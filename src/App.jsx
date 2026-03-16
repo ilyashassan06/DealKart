@@ -5,7 +5,8 @@ import UserLayout from "./Layout/UserLayout";
 import MerchantLayout from "./Layout/MerchantLayout";
 import MerchantProtectedRoute from "./components/ProtectedRoutes/MerchantProtectedRoute";
 
-const Home = lazy(() => import("./pages/User/Home"));
+import Home from "./pages/User/Home";
+import { useAuth } from "./context/UserAuthContext";
 
 const Login = lazy(() => import("./pages/Auth/Login"));
 const Signup = lazy(() => import("./pages/Auth/Signup"));
@@ -23,53 +24,119 @@ const Category = lazy(() => import("./pages/User/Category"));
 const About = lazy(() => import("./pages/User/About"));
 const Contact = lazy(() => import("./pages/User/Contact"));
 
-function App() {
+function Loader() {
+
+
   return (
-    <Suspense fallback={<div className="p-10 text-center">Loading...</div>}>
+    <div className="flex items-center justify-center h-screen">
+      Loading...
+    </div>
+  );
+}
 
-      <Routes>
+function App() {
+  const   {Loading}= useAuth()
 
-        {/* AUTH ROUTES */}
+   if (Loading) {
+    return <Loader />;
+  }
 
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
+  return (
+    <Routes>
 
-        <Route path="/merchant/login" element={<MerchantLogin />} />
-        <Route path="/merchant/signup" element={<MerchantSignup />} />
+      {/* AUTH ROUTES */}
+      <Route path="/login" element={
+        <Suspense fallback={<Loader />}>
+          <Login />
+        </Suspense>
+      } />
 
-        {/* USER ROUTES */}
+      <Route path="/signup" element={
+        <Suspense fallback={<Loader />}>
+          <Signup />
+        </Suspense>
+      } />
 
-        <Route element={<UserLayout />}>
+      <Route path="/merchant/login" element={
+        <Suspense fallback={<Loader />}>
+          <MerchantLogin />
+        </Suspense>
+      } />
 
-          <Route path="/" element={<Home />} />
-          <Route path="/Cart" element={<Cart />} />
-          <Route path="/Products" element={<Products />} />
-          <Route path="/Category/:categoryName" element={<Category />} />
-          <Route path="/Wishlist" element={<Wishlist />} />
-          <Route path="/AboutUs" element={<About />} />
-          <Route path="/ContactUs" element={<Contact />} />
+      <Route path="/merchant/signup" element={
+        <Suspense fallback={<Loader />}>
+          <MerchantSignup />
+        </Suspense>
+      } />
 
-        </Route>
+      {/* USER ROUTES */}
+      <Route element={<UserLayout />}>
 
-        {/* MERCHANT ROUTES */}
+        <Route path="/" element={<Home />} />
 
-        <Route
-          path="/merchant"
-          element={
-            <MerchantProtectedRoute>
-              <MerchantLayout />
-            </MerchantProtectedRoute>
-          }
-        >
+        <Route path="/Cart" element={
+          <Suspense fallback={<Loader />}>
+            <Cart />
+          </Suspense>
+        } />
 
-          <Route path="dashboard" element={<Dashboard />} />
-          <Route path="add-product" element={<AddProduct />} />
+        <Route path="/Products" element={
+          <Suspense fallback={<Loader />}>
+            <Products />
+          </Suspense>
+        } />
 
-        </Route>
+        <Route path="/Category/:categoryName" element={
+          <Suspense fallback={<Loader />}>
+            <Category />
+          </Suspense>
+        } />
 
-      </Routes>
+        <Route path="/Wishlist" element={
+          <Suspense fallback={<Loader />}>
+            <Wishlist />
+          </Suspense>
+        } />
 
-    </Suspense>
+        <Route path="/AboutUs" element={
+          <Suspense fallback={<Loader />}>
+            <About />
+          </Suspense>
+        } />
+
+        <Route path="/ContactUs" element={
+          <Suspense fallback={<Loader />}>
+            <Contact />
+          </Suspense>
+        } />
+
+      </Route>
+
+      {/* MERCHANT ROUTES */}
+      <Route
+        path="/merchant"
+        element={
+          <MerchantProtectedRoute>
+            <MerchantLayout />
+          </MerchantProtectedRoute>
+        }
+      >
+
+        <Route path="dashboard" element={
+          <Suspense fallback={<Loader />}>
+            <Dashboard />
+          </Suspense>
+        } />
+
+        <Route path="add-product" element={
+          <Suspense fallback={<Loader />}>
+            <AddProduct />
+          </Suspense>
+        } />
+
+      </Route>
+
+    </Routes>
   );
 }
 
