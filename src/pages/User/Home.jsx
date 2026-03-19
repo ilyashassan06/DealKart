@@ -1,7 +1,7 @@
 import React from "react";
 import { useProducts } from "../../context/ProductsContext";
 import { useTheme } from "../../context/ThemeContext";
-import CardSlider from "../../components/Reusable/Cardslider";
+import CardSlider from "../../components/Reusable/CardSlider";
 
 function Home() {
   const { products } = useProducts();
