@@ -81,10 +81,10 @@ function UserNavbar() {
 
 </div>
 
-      <div className=" flex text-xl items-center gap-6">
+      <div className="flex text-xl items-center gap-6">
          <button
          onClick={()=>navigate("/merchant/login")}
-      className={`text-sm font-semibold px-4 py-2 rounded-xl transition
+      className={`hidden md:flextext-sm font-semibold px-4 py-2 rounded-xl transition
       ${
         Theme === "dark"
           ? "bg-white text-black hover:bg-gray-200"
@@ -163,96 +163,88 @@ function UserNavbar() {
         </button>
       </div>
       {/* Mobile Menu */}
-      {menuOpen && (
+    {menuOpen && (
   <div
-    className={`absolute top-13 left-1/2 -translate-x-1/2 w-full max-w-md
-    p-4 flex flex-col shadow-xl border  z-50
+    className={`absolute top-14 left-1/2 -translate-x-1/2 w-full max-w-md
+     p-3 flex flex-col gap-2 shadow-2xl border backdrop-blur-xl z-50
+    transition-all duration-300
     ${
       Theme === "dark"
-        ? "bg-gray-900 border-gray-700 text-white"
-        : "bg-white border-gray-200 text-black"
+        ? "bg-gray-900/90 border-gray-700 text-white"
+        : "bg-white/90 border-gray-200 text-black"
     }`}
   >
 
-    <NavLink
-      to="/products"
-      onClick={() => setMenuOpen(false)}
-      className={({ isActive }) =>
-        `w-full text-center py-3 border-b ${
-          Theme === "dark" ? "border-gray-700" : "border-gray-200"
+    {/* MENU ITEMS */}
+    {[
+      { name: "Products", path: "/products" },
+      { name: "About Us", path: "/AboutUs" },
+      { name: "Contact Us", path: "/ContactUs" },
+      { name: "Merchant Dashboard", path: "/merchant/dashboard" },
+    ].map((item) => (
+      <NavLink
+        key={item.name}
+        to={item.path}
+        onClick={() => setMenuOpen(false)}
+        className={({ isActive }) =>
+          `flex items-center justify-between px-4 py-3 rounded-xl transition-all duration-200
+          ${
+            isActive
+              ? "bg-red-500 text-white shadow-md"
+              : Theme === "dark"
+              ? "hover:bg-gray-800"
+              : "hover:bg-gray-100"
+          }`
         }
-        ${isActive ? "text-red-600 font-semibold" : "hover:opacity-70"}`
-      }
-    >
-      Products
-    </NavLink>
+      >
+        <span className="font-medium">{item.name}</span>
+        <span className="text-sm opacity-60">→</span>
+      </NavLink>
+    ))}
 
-    <NavLink
-      to="/AboutUs"
-      onClick={() => setMenuOpen(false)}
-      className={({ isActive }) =>
-        `w-full text-center py-3 border-b ${
-          Theme === "dark" ? "border-gray-700" : "border-gray-200"
-        }
-        ${isActive ? "text-red-600 font-semibold" : "hover:opacity-70"}`
-      }
-    >
-      About Us
-    </NavLink>
+    {/* DIVIDER */}
+    <div
+      className={`my-2 h-px ${
+        Theme === "dark" ? "bg-gray-700" : "bg-gray-200"
+      }`}
+    />
 
-    <NavLink
-      to="/ContactUs"
-      onClick={() => setMenuOpen(false)}
-      className={({ isActive }) =>
-        `w-full text-center py-3 border-b ${
-          Theme === "dark" ? "border-gray-700" : "border-gray-200"
-        }
-        ${isActive ? "text-red-600 font-semibold" : "hover:opacity-70"}`
-      }
-    >
-      Contact Us
-    </NavLink>
-    <NavLink
-      to="/merchant/dashboard"
-      onClick={() => setMenuOpen(false)}
-      className={({ isActive }) =>
-        `w-full text-center py-3 border-b ${
-          Theme === "dark" ? "border-gray-700" : "border-gray-200"
-        }
-        ${isActive ? "text-red-600 font-semibold" : "hover:opacity-70"}`
-      }
-    >
-      Merchant Dashboard
-    </NavLink>
-
+    {/* THEME TOGGLE */}
     <button
-      onClick={toggleTheme}
-      className={`w-full py-3 border-b text-center transition
+      onClick={()=>{
+        toggleTheme();
+        setMenuOpen(false)
+      }}
+      className={`flex items-center justify-between px-4 py-3 rounded-xl transition
       ${
         Theme === "dark"
-          ? "border-gray-700 hover:bg-gray-800"
-          : "border-gray-200 hover:bg-gray-100"
+          ? "hover:bg-gray-800"
+          : "hover:bg-gray-100"
       }`}
     >
-      {Theme === "dark" ? "Light Mode ☀️" : "Dark Mode 🌙"}
+      <span className="font-medium">
+        {Theme === "dark" ? "Light Mode ☀️" : "Dark Mode 🌙"}
+      </span>
+      <span className="text-sm opacity-60">⚙️</span>
     </button>
 
-    {user ? (
-      <button
-        onClick={handleLogout}
-        className="w-full py-3 text-center hover:opacity-80 transition"
-      >
-        Logout
-      </button>
-    ) : (
-      <button
-        onClick={() => navigate("/login")}
-        className="w-full py-3 text-center hover:opacity-80 transition"
-      >
-        Login
-      </button>
-    )}
-
+    {/* AUTH BUTTON */}
+    <button
+      onClick={() => {
+        setMenuOpen(false);
+        user ? handleLogout() : navigate("/login");
+      }}
+      className={`mt-2 py-3 rounded-xl font-semibold transition-all
+      ${
+        user
+          ? "bg-red-500 text-white hover:bg-red-600"
+          : Theme === "dark"
+          ? "bg-white text-black hover:bg-gray-200"
+          : "bg-black text-white hover:bg-gray-800"
+      }`}
+    >
+      {user ? "Logout" : "Login"}
+    </button>
   </div>
 )}
 

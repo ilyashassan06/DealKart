@@ -143,7 +143,15 @@ function MerchantLogin() {
           >
             Login
           </button>
-
+            <p className="text-sm text-center mt-5 text-gray-500">
+            Already have an account?{" "}
+            <span
+              onClick={() => navigate("/merchant/Signup")}
+              className="text-black  font-medium cursor-pointer border-b border-transparent hover:border-current transition"
+            >
+              Signup
+            </span>
+          </p>
         </form>
 
       </div>

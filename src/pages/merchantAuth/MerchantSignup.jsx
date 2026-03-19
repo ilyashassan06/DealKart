@@ -15,34 +15,29 @@ function MerchantSignup() {
     register,
     handleSubmit,
     watch,
-    formState: { errors }
+    formState: { errors },
   } = useForm();
 
   const password = watch("password");
 
   const onSubmit = async (data) => {
-   try {
-     const merchantCredentials =  await createUserWithEmailAndPassword(
-      auth,
-      data.email,
-      data.password
-    );
-    const merchant = merchantCredentials.user;
+    try {
+      const merchantCredentials = await createUserWithEmailAndPassword(
+        auth,
+        data.email,
+        data.password,
+      );
+      const merchant = merchantCredentials.user;
 
-    await setDoc(doc(db,"merchant",merchant.uid),{
-      name:data.ownerName,
-      storeName:data.storeName,
-      email:data.email,
-      role:"merchant"
-    })
+      await setDoc(doc(db, "merchant", merchant.uid), {
+        name: data.ownerName,
+        storeName: data.storeName,
+        email: data.email,
+        role: "merchant",
+      });
 
-    navigate("/merchant/login")
-
-    
-   } catch (error) {
-    
-   }
-
+      navigate("/merchant/Dashboard");
+    } catch (error) {}
   };
 
   return (
@@ -50,18 +45,13 @@ function MerchantSignup() {
       className={`min-h-screen flex items-center justify-center px-4
       ${theme === "dark" ? "bg-gray-900 text-white" : "bg-gray-100 text-black"}`}
     >
-
       <div
         className={`w-full max-w-md p-8 rounded-2xl
         ${theme === "dark" ? "bg-gray-800" : "bg-white"} shadow-sm`}
       >
-
-        <h2 className="text-2xl font-bold text-center mb-6">
-          Merchant Signup
-        </h2>
+        <h2 className="text-2xl font-bold text-center mb-6">Merchant Signup</h2>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-
           {/* Store Name */}
           <div>
             <label className="text-sm font-medium">Store Name</label>
@@ -71,9 +61,11 @@ function MerchantSignup() {
               placeholder="Enter store name"
               {...register("storeName", { required: "Store name is required" })}
               className={`w-full mt-1 p-3 rounded-lg border
-              ${theme === "dark"
-                ? "bg-gray-700 border-gray-600"
-                : "bg-gray-50 border-gray-300"}`}
+              ${
+                theme === "dark"
+                  ? "bg-gray-700 border-gray-600"
+                  : "bg-gray-50 border-gray-300"
+              }`}
             />
 
             {errors.storeName && (
@@ -91,9 +83,11 @@ function MerchantSignup() {
               placeholder="Enter store name"
               {...register("ownerName", { required: "Store name is required" })}
               className={`w-full mt-1 p-3 rounded-lg border
-              ${theme === "dark"
-                ? "bg-gray-700 border-gray-600"
-                : "bg-gray-50 border-gray-300"}`}
+              ${
+                theme === "dark"
+                  ? "bg-gray-700 border-gray-600"
+                  : "bg-gray-50 border-gray-300"
+              }`}
             />
 
             {errors.storeName && (
@@ -102,7 +96,6 @@ function MerchantSignup() {
               </p>
             )}
           </div>
-
 
           {/* Email */}
           <div>
@@ -113,9 +106,11 @@ function MerchantSignup() {
               placeholder="Enter email"
               {...register("email", { required: "Email is required" })}
               className={`w-full mt-1 p-3 rounded-lg border
-              ${theme === "dark"
-                ? "bg-gray-700 border-gray-600"
-                : "bg-gray-50 border-gray-300"}`}
+              ${
+                theme === "dark"
+                  ? "bg-gray-700 border-gray-600"
+                  : "bg-gray-50 border-gray-300"
+              }`}
             />
 
             {errors.email && (
@@ -124,9 +119,6 @@ function MerchantSignup() {
               </p>
             )}
           </div>
-
-
-  
 
           {/* Password */}
           <div>
@@ -137,9 +129,11 @@ function MerchantSignup() {
               placeholder="Enter password"
               {...register("password", { required: "Password is required" })}
               className={`w-full mt-1 p-3 rounded-lg border
-              ${theme === "dark"
-                ? "bg-gray-700 border-gray-600"
-                : "bg-gray-50 border-gray-300"}`}
+              ${
+                theme === "dark"
+                  ? "bg-gray-700 border-gray-600"
+                  : "bg-gray-50 border-gray-300"
+              }`}
             />
 
             {errors.password && (
@@ -148,7 +142,6 @@ function MerchantSignup() {
               </p>
             )}
           </div>
-
 
           {/* Confirm Password */}
           <div>
@@ -160,12 +153,14 @@ function MerchantSignup() {
               {...register("confirmPassword", {
                 required: "Confirm your password",
                 validate: (value) =>
-                  value === password || "Passwords do not match"
+                  value === password || "Passwords do not match",
               })}
               className={`w-full mt-1 p-3 rounded-lg border
-              ${theme === "dark"
-                ? "bg-gray-700 border-gray-600"
-                : "bg-gray-50 border-gray-300"}`}
+              ${
+                theme === "dark"
+                  ? "bg-gray-700 border-gray-600"
+                  : "bg-gray-50 border-gray-300"
+              }`}
             />
 
             {errors.confirmPassword && (
@@ -175,7 +170,6 @@ function MerchantSignup() {
             )}
           </div>
 
-
           {/* Submit Button */}
           <button
             type="submit"
@@ -183,11 +177,17 @@ function MerchantSignup() {
           >
             Create Merchant Account
           </button>
-
+          <p className="text-sm text-center mt-5 text-gray-500">
+            Already have an account?{" "}
+            <span
+              onClick={() => navigate("/merchant/login")}
+              className="text-black  font-medium cursor-pointer border-b border-transparent hover:border-current transition"
+            >
+              Login
+            </span>
+          </p>
         </form>
-
       </div>
-
     </div>
   );
 }

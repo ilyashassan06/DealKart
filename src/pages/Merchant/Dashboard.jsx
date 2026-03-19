@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "../../context/ThemeContext";
 import { db, auth } from "../../firebase/firebase";
-import { doc, getDoc } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, query, where } from "firebase/firestore";
 
 function Dashboard() {
   const { Theme } = useTheme();
@@ -12,26 +12,36 @@ function Dashboard() {
 
   /* ---------------- FETCH MERCHANT DATA ---------------- */
 
-  useEffect(() => {
-    const fetchMerchantData = async () => {
-      try {
-        const merchantId = auth.currentUser.uid;
 
-        const merchantRef = doc(db, "merchant", merchantId);
-        const merchantSnap = await getDoc(merchantRef);
 
-        if (merchantSnap.exists()) {
-          const data = merchantSnap.data();
-          setProducts(data.products || []);
-        }
-      } catch (err) {
-        console.log(err);
-      }
-    };
+useEffect(() => {
+  const fetchMerchantProducts = async () => {
+    try {
+      const merchantId = auth.currentUser.uid;
 
-    fetchMerchantData();
-  }, []);
+      // Query products where merchantId matches current user
+      const q = query(
+        collection(db, "products"),
+        where("merchantId", "==", merchantId)
+      );
 
+      const querySnapshot = await getDocs(q);
+
+      const merchantProducts = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      setProducts(merchantProducts);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  fetchMerchantProducts();
+}, []);
+
+  console.log(products)
   const totalProducts = products.length;
 
   /* ---------------- UI ---------------- */
