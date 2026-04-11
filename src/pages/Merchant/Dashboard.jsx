@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTheme } from "../../context/ThemeContext";
 import { db, auth } from "../../firebase/firebase";
-import { collection, doc, getDoc, getDocs, query, where } from "firebase/firestore";
+import { collection, deleteDoc, doc, getDoc, getDocs, query, where } from "firebase/firestore";
 
 function Dashboard() {
   const { Theme } = useTheme();
@@ -10,10 +10,10 @@ function Dashboard() {
 
   const [products, setProducts] = useState([]);
 
-  /* ---------------- FETCH MERCHANT DATA ---------------- */
 
 
 
+ /* ---------------- FETCH MERCHANT DATA ---------------- */
 useEffect(() => {
   const fetchMerchantProducts = async () => {
     try {
@@ -33,6 +33,7 @@ useEffect(() => {
       }));
 
       setProducts(merchantProducts);
+      console.log(products)
     } catch (err) {
       console.log(err);
     }
@@ -41,7 +42,24 @@ useEffect(() => {
   fetchMerchantProducts();
 }, []);
 
-  console.log(products)
+
+  /* ---------------- Delte product ---------------- */
+
+  const handleDelete = async (id)=>{
+    try {
+       const confirmDelete = window.confirm("Delete this product?");
+    if (!confirmDelete) return;
+
+    await deleteDoc(doc(db,"products",id))
+    setProducts(prev => prev.filter(p => p.id !== id));
+      console.log("Deleted successfully");
+    } catch (error) {
+      
+    }
+
+  }
+
+
   const totalProducts = products.length;
 
   /* ---------------- UI ---------------- */
@@ -120,85 +138,144 @@ useEffect(() => {
       </div>
 
       {/* Recent Products */}
-      <div
-        className={`p-6 rounded-xl border ${
-          Theme === "dark"
-            ? "bg-gray-900 border-gray-700"
-            : "bg-white border-gray-200"
-        }`}
-      >
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-xl font-semibold">Recent Products</h2>
+<div
+  className={`p-4 sm:p-6 rounded-2xl border shadow-sm ${
+    Theme === "dark"
+      ? "bg-gray-900 border-gray-800 text-gray-100"
+      : "bg-white border-gray-200 text-gray-900"
+  }`}
+>
+  {/* Header */}
+  <div className="flex items-center justify-between mb-5">
+    <h2 className="text-lg sm:text-xl font-semibold">
+      Recent Products
+    </h2>
 
-          <button
-            onClick={() => navigate("/merchant/products")}
-            className="text-sm underline hover:opacity-70"
-          >
-            View All
-          </button>
-        </div>
+    <button
+      onClick={() => navigate("/merchant/products")}
+      className="text-xs sm:text-sm underline hover:opacity-70"
+    >
+      View All
+    </button>
+  </div>
 
-        {/* Table */}
-        <div className="overflow-x-auto">
-          <table className="w-full text-left">
+  {/* ---------------- MOBILE VIEW ---------------- */}
+  <div className="space-y-3 sm:hidden">
+    {products.length === 0 ? (
+      <p className="text-sm opacity-60">No products yet</p>
+    ) : (
+      products.slice(-5).reverse().map((product) => (
+        <div
+          key={product.id}
+          className={`p-4 rounded-xl border ${
+            Theme === "dark"
+              ? "border-gray-800 bg-gray-900"
+              : "border-gray-200 bg-white"
+          }`}
+        >
+          {/* Top */}
+          <div className="flex items-center gap-3 mb-3">
+            {product.images?.[0] && (
+              <img
+                src={product.images[0]}
+                className="w-12 h-12 rounded-lg object-cover"
+              />
+            )}
 
-            <thead>
-              <tr
-                className={`border-b ${
-                  Theme === "dark"
-                    ? "border-gray-700"
-                    : "border-gray-200"
-                }`}
+            <div className="flex-1">
+              <p className="font-medium text-sm">
+                {product.name}
+              </p>
+              <p className="text-xs opacity-60">
+                ₹{product.price}
+              </p>
+            </div>
+          </div>
+
+          {/* Bottom */}
+          <div className="flex items-center justify-between">
+            <span
+              className={`text-xs font-medium ${
+                product.stock < 5
+                  ? "text-red-500"
+                  : "text-green-500"
+              }`}
+            >
+              Stock: {product.stock}
+            </span>
+
+            <div className="flex gap-2">
+              <button
+                onClick={() => handleEdit(product)}
+                className="px-3 py-1 text-xs rounded-lg border hover:bg-gray-100 dark:hover:bg-gray-800"
               >
-                <th className="py-3">Product</th>
-                <th className="py-3">Price</th>
-                <th className="py-3">Stock</th>
-              </tr>
-            </thead>
+                Edit
+              </button>
 
-            <tbody>
-
-              {products.length === 0 ? (
-                <tr>
-                  <td className="py-3">No products yet</td>
-                  <td>-</td>
-                  <td>-</td>
-                </tr>
-              ) : (
-                products.slice(-5).reverse().map((product, index) => (
-                  <tr
-                    key={index}
-                    className={`border-b ${
-                      Theme === "dark"
-                        ? "border-gray-800"
-                        : "border-gray-100"
-                    }`}
-                  >
-                    <td className="py-3 flex items-center gap-3">
-
-                      {product.images?.[0] && (
-                        <img
-                          src={product.images[0]}
-                          className="w-10 h-10 object-cover rounded"
-                        />
-                      )}
-
-                      {product.name}
-
-                    </td>
-
-                    <td>₹{product.price}</td>
-
-                    <td>{product.stock}</td>
-                  </tr>
-                ))
-              )}
-
-            </tbody>
-
-          </table>
+              <button
+                onClick={() => handleDelete(product.id)}
+                className="px-3 py-1 text-xs rounded-lg border text-red-500 border-red-400 hover:bg-red-50 dark:hover:bg-red-900/30"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
         </div>
-      </div>
+      ))
+    )}
+  </div>
+
+  {/* ---------------- DESKTOP TABLE ---------------- */}
+  <div className="hidden sm:block overflow-x-auto">
+    <table className="w-full text-sm">
+      
+      <thead>
+        <tr
+          className={`text-xs uppercase ${
+            Theme === "dark"
+              ? "text-gray-400 border-b border-gray-700"
+              : "text-gray-500 border-b border-gray-200"
+          }`}
+        >
+          <th className="py-3 text-left">Product</th>
+          <th className="py-3 text-left">Price</th>
+          <th className="py-3 text-left">Stock</th>
+          <th className="py-3 text-right">Actions</th>
+        </tr>
+      </thead>
+
+      <tbody className="divide-y divide-gray-200 dark:divide-gray-800">
+        {products.slice(-5).reverse().map((product) => (
+          <tr key={product.id}>
+            <td className="py-4">
+              <div className="flex items-center gap-3">
+                {product.images?.[0] && (
+                  <img
+                    src={product.images[0]}
+                    className="w-10 h-10 rounded-lg object-cover"
+                  />
+                )}
+                {product.name}
+              </div>
+            </td>
+
+            <td>₹{product.price}</td>
+
+            <td>{product.stock}</td>
+
+            <td className="text-right">
+              <div className="flex justify-end gap-2">
+                <button onClick={() => handleEdit(product)} className="border-2 p-1 rounded">✏️</button>
+                <button onClick={() => handleDelete(product.id)} className="border-2 p-1 rounded">🗑️</button>
+              </div>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+
+    </table>
+  </div>
+</div>
 
     </div>
   );
