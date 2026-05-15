@@ -7,6 +7,7 @@ import MerchantProtectedRoute from "./components/ProtectedRoutes/MerchantProtect
 
 import Home from "./pages/User/Home";
 import { useAuth } from "./context/UserAuthContext";
+import LoadingScreen from "./components/Reusable/LoadingScreen";
 
 const Login = lazy(() => import("./pages/Auth/Login"));
 const Signup = lazy(() => import("./pages/Auth/Signup"));
@@ -27,11 +28,9 @@ const Contact = lazy(() => import("./pages/User/Contact"));
 function Loader() {
 
 
-  return (
-    <div className="flex items-center justify-center h-screen">
-      Loading...
-    </div>
-  );
+  
+    return <LoadingScreen />;
+  
 }
 
 function App() {
@@ -42,31 +41,32 @@ function App() {
   }
 
   return (
+     <Suspense fallback={<Loader />}>
     <Routes>
 
       {/* AUTH ROUTES */}
       <Route path="/login" element={
-        <Suspense fallback={<Loader />}>
+      
           <Login />
-        </Suspense>
+       
       } />
 
       <Route path="/signup" element={
-        <Suspense fallback={<Loader />}>
+       
           <Signup />
-        </Suspense>
+       
       } />
 
       <Route path="/merchant/login" element={
-        <Suspense fallback={<Loader />}>
+        
           <MerchantLogin />
-        </Suspense>
+        
       } />
 
       <Route path="/merchant/signup" element={
-        <Suspense fallback={<Loader />}>
+        
           <MerchantSignup />
-        </Suspense>
+       
       } />
 
       {/* USER ROUTES */}
@@ -75,39 +75,39 @@ function App() {
         <Route path="/" element={<Home />} />
 
         <Route path="/Cart" element={
-          <Suspense fallback={<Loader />}>
+          
             <Cart />
-          </Suspense>
+         
         } />
 
         <Route path="/Products" element={
-          <Suspense fallback={<Loader />}>
+         
             <Products />
-          </Suspense>
+          
         } />
 
         <Route path="/Category/:categoryName" element={
-          <Suspense fallback={<Loader />}>
+        
             <Category />
-          </Suspense>
+          
         } />
 
         <Route path="/Wishlist" element={
-          <Suspense fallback={<Loader />}>
+          
             <Wishlist />
-          </Suspense>
+         
         } />
 
         <Route path="/AboutUs" element={
-          <Suspense fallback={<Loader />}>
+          
             <About />
-          </Suspense>
+         
         } />
 
         <Route path="/ContactUs" element={
-          <Suspense fallback={<Loader />}>
+          
             <Contact />
-          </Suspense>
+         
         } />
 
       </Route>
@@ -123,20 +123,21 @@ function App() {
       >
 
         <Route path="dashboard" element={
-          <Suspense fallback={<Loader />}>
+          
             <Dashboard />
-          </Suspense>
+          
         } />
 
         <Route path="add-product" element={
-          <Suspense fallback={<Loader />}>
+        
             <AddProduct />
-          </Suspense>
+          
         } />
 
       </Route>
 
     </Routes>
+    </Suspense>
   );
 }
 
