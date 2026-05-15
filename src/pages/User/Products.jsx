@@ -4,7 +4,7 @@ import { useTheme } from "../../context/ThemeContext";
 import CardSlider from "../../components/Reusable/CardSlider";
 import ProductCard from "../../components/Reusable/ProductCard";
 import { useState } from "react";
-import FilterSection from "../../components/Reusable/filterSection";
+import FilterSection from "../../components/Reusable/FilterSection";
 
 function Products() {
  
