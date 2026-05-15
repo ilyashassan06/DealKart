@@ -37,7 +37,10 @@ function MerchantSignup() {
       });
 
       navigate("/merchant/Dashboard");
-    } catch (error) {}
+    } catch (error) {
+      console.log(error.code);
+  console.log(error.message);
+    }
   };
 
   return (
