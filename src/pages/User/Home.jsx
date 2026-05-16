@@ -2,10 +2,12 @@ import React from "react";
 import { useProducts } from "../../context/ProductsContext";
 import { useTheme } from "../../context/ThemeContext";
 import CardSlider from "../../components/Reusable/CardSlider";
+import { useNavigate } from "react-router-dom";
 
 function Home() {
   const { products } = useProducts();
   const { Theme } = useTheme();
+  const navigate = useNavigate();
 
   const isDark = Theme === "dark";
 
@@ -122,6 +124,7 @@ function Home() {
     {categories.map((c) => (
       <div
         key={c}
+        onClick={()=>navigate(`Category/${c}`)}
         className={`group rounded-2xl p-6 cursor-pointer transition-all duration-300 hover:-translate-y-1 ${
           isDark
             ? "bg-linear-to-br from-gray-900 to-gray-800 border border-gray-800 hover:border-gray-700"
